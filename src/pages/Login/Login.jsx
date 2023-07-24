@@ -1,14 +1,31 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import { toast } from "react-toastify";
+import SocialSignIn from "../../components/shared/SocialSignIn";
 
 const Login = () => {
+  const { loginUser } = useAuth();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    loginUser(data?.email, data?.password)
+      .then((result) => {
+        if (result?.user) {
+          toast.success("login success");
+          navigate("/");
+        }
+      })
+      .catch((err) => {
+        toast.error(err?.message);
+      });
+  };
 
   return (
     <div
@@ -77,6 +94,8 @@ const Login = () => {
                 </button>
               </div>
             </form>
+            <div className="divider"></div>
+            <SocialSignIn />
           </div>
         </div>
       </div>

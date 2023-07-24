@@ -4,10 +4,12 @@ import useAuth from "../../../hooks/useAuth";
 import { SearchContext } from "../../../provider/SearchProvider";
 import { useContext } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Headers = () => {
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
   const { setSearchResult } = useContext(SearchContext);
+  console.log(user);
 
   const menuItems = (
     <>
@@ -33,6 +35,13 @@ const Headers = () => {
         .get(`${import.meta.env.VITE_API_URL}/colleges/search/${searchText}`)
         .then((res) => setSearchResult(res.data));
     }
+  };
+
+  // handle logout
+  const handleLogout = () => {
+    logOut().then(() => {
+      toast.success("logout successful");
+    });
   };
 
   return (
@@ -86,11 +95,18 @@ const Headers = () => {
                 <Link to="/profile">
                   <div className="avatar mr-4">
                     <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                      <img src="/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                      <img
+                        src={
+                          user?.photoURL ||
+                          "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80"
+                        }
+                      />
                     </div>
                   </div>
                 </Link>
-                <button className="btn">Logout</button>
+                <button onClick={handleLogout} className="btn">
+                  Logout
+                </button>
               </>
             ) : (
               <Link to="/login">

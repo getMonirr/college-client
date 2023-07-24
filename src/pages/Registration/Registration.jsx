@@ -1,14 +1,46 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+import { updateProfile } from "firebase/auth";
+import { toast } from "react-toastify";
+import SocialSignIn from "../../components/shared/SocialSignIn";
 
 const Registration = () => {
+  const { createUser } = useAuth();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    createUser(data?.email, data?.password)
+      .then((result) => {
+        if (result?.user) {
+          updateProfile(result?.user, {
+            displayName: data?.name,
+            photoURL: data?.photoUrl,
+          }).then(() => {
+            toast.success("Registration successful, login now", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+
+            // navigate
+            navigate("/");
+          });
+        }
+      })
+      .catch((err) => console.log(err?.message));
+  };
 
   return (
     <div
@@ -68,6 +100,10 @@ const Registration = () => {
                   placeholder="password"
                   className="input input-bordered"
                 />
+                <span className="text-xs">
+                  Minimum 6 characters, at least one uppercase & lowercase
+                  letter, one number and special character
+                </span>
                 {errors.password && (
                   <span className="text-red-400 text-xs">
                     password is required.
@@ -87,6 +123,8 @@ const Registration = () => {
                 </button>
               </div>
             </form>
+            <div className="divider"></div>
+            <SocialSignIn />
           </div>
         </div>
       </div>

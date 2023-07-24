@@ -24,6 +24,8 @@ const Review = () => {
         .then((res) => res.data),
   });
 
+  console.log(`${import.meta.env.VITE_API_URL}/reviews`);
+
   return (
     <>
       <SectionTitle>Review</SectionTitle>
